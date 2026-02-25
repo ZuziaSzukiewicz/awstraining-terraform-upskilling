@@ -56,3 +56,9 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_from_alb_8081"{
     to_port = 8081
     ip_protocol = "tcp"
 }
+
+resource "aws_vpc_security_group_egress_rule" "ecs_all" {
+  security_group_id = aws_security_group.ecs_tasks_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}

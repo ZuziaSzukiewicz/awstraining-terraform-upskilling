@@ -1,23 +1,20 @@
-variable "environment" {
-  description = "Environment to create ECS service in"
-}
+variable "region" { type = string }
+variable "profile" { type = string }
+variable "shared_credentials_file" { type = string }
 
-variable "region" {
-  description = "Region to create ECS service in"
-}
+variable "remote_state_bucket" { type = string }
 
-variable "remote_state_bucket" {
-  description = "Remote state bucket for saving state"
-}
+# These must match the S3 backend "key" used in each root folder
+variable "sg_state_key" { type = string }
+variable "ecr_state_key" { type = string }
+variable "dynamodb_state_key" { type = string }
 
-variable "profile" {
-  description = "Default profile id"
-}
+variable "execution_role_arn" { type = string }
+variable "task_role_arn" { type = string }
 
-variable "shared_credentials_file" {
-  description = "Path to cloud credentials"
-}
+variable "log_group_name" { type = string }
 
 variable "common_tags" {
-  type = map(string)
+  type    = map(string)
+  default = {}
 }
