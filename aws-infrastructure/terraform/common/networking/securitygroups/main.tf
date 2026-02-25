@@ -21,6 +21,38 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
-// TODO: implement sg for lb and fargate
+resource "aws_security_group" "alb_sg" {
+  name = "awsupskilling-alb-sg"
+  description = "ALB Securitu group"
+  vpc_id = "vpc-09ff9a9f4fa826e31"
+}
 
+resource "aws_security_group" "ecs_tasks_sg" {
+  name = "awsupskilling-ecs-tasks-sg"
+  description = "ECS Security group"
+  vpc_id = "vpc-09ff9a9f4fa826e31"
+}
 
+resource "aws_vpc_security_group_ingress_rule" "alb_http" {
+    security_group_id = aws_security_group.alb_sg.id
+    cidr_ipv4 = "0.0.0.0/0"
+    from_port = 80
+    to_port = 80
+    ip_protocol = "tcp"
+}
+
+resource "aws_vpc_security_group_egress_rule" "alb_to_ecs_8081"{
+    security_group_id = aws_security_group.alb_sg.id
+    referenced_security_group_id = aws_security_group.ecs_tasks_sg.id
+    from_port        = 8081
+    to_port          = 8081
+    ip_protocol         = "tcp"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ecs_from_alb_8081"{
+    security_group_id = aws_security_group.ecs_tasks_sg.id
+    referenced_security_group_id = aws_security_group.alb_sg.id
+    from_port = 8081
+    to_port = 8081
+    ip_protocol = "tcp"
+}

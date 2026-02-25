@@ -5,6 +5,6 @@ provider "aws" {
 
 module "bucket" {
   source = "../../../modules/simple-bucket"
-  name   = "<<UNIQUE_BUCKET_NAME>>"
+  name   = "awsupskilling-bucket"
 }
 

@@ -1,0 +1,1 @@
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"aws_ecr_repository","Source":"../../../modules/ecr","Dir":"../../../modules/ecr"},{"Key":"ecr","Source":"../../../modules/ecr","Dir":"../../../modules/ecr"}]}

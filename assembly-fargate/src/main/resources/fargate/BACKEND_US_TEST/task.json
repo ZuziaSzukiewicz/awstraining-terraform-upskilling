@@ -1,6 +1,6 @@
 {
   "family": "backend-task-test",
-  "executionRoleArn": "arn:aws:iam::<<ACCOUNT_ID>>:role/backend-ecs-execution-role-us-east-1",
+  "executionRoleArn": "arn:aws:iam::497196579670:role/backend-ecs-execution-role-us-east-1",
   "containerDefinitions": [
     {
       "logConfiguration": {
@@ -40,7 +40,7 @@
       ],
       "secrets": [
         {
-          "valueFrom": "<<TODO: set ARN of secrets manager>>",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:497196579670:secret:awsupskilling-secret-authorization-Daln1m",
           "name": "SPRING_APPLICATION_JSON"
         }
       ],
