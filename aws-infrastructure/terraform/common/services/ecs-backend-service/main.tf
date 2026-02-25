@@ -4,6 +4,22 @@ provider "aws" {
   profile                  = var.profile
 }
 
+terraform {
+  backend "s3" {
+    dynamodb_table = "backend_tf_lock_remote_dynamo"
+  }
+}
+
+data "terraform_remote_state" "globals" {
+  backend = "s3"
+  config = {
+    bucket = var.remote_state_bucket
+    dynamodb_table = "backend_tf_lock_remote_dynamo"
+    key = "globals.tfstate"
+    region = var.region
+  }
+}
+
 # Local VPC module (this root creates VPC)
 module "vpc" {
   source = "../../../modules/vpc"
