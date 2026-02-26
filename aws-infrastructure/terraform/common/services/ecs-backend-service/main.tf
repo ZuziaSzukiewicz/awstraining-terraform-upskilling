@@ -10,19 +10,24 @@ terraform {
   }
 }
 
-data "terraform_remote_state" "globals" {
+data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = var.remote_state_bucket
+    bucket         = var.remote_state_bucket
+    key            = var.vpc_state_key
+    region         = var.region
     dynamodb_table = "backend_tf_lock_remote_dynamo"
-    key = "globals.tfstate"
-    region = var.region
   }
 }
 
-# Local VPC module (this root creates VPC)
-module "vpc" {
-  source = "../../../modules/vpc"
+data "terraform_remote_state" "cluster" {
+  backend = "s3"
+  config = {
+    bucket         = var.remote_state_bucket
+    key            = var.cluster_state_key
+    region         = var.region
+    dynamodb_table = "backend_tf_lock_remote_dynamo"
+  }
 }
 
 # Remote state: Security Groups (created in another folder/state)
@@ -58,28 +63,31 @@ data "terraform_remote_state" "dynamodb" {
   }
 }
 
-# ECS Cluster
-module "ecs_cluster" {
-  source = "../../../modules/ecs-backend-cluster"
-  name   = "awsupskilling_ecs_cluster"
+data "terraform_remote_state" "iam" {
+  backend = "s3"
+  config = {
+    bucket         = var.remote_state_bucket
+    key            = var.iam_state_key
+    region         = var.region
+    dynamodb_table = "backend_tf_lock_remote_dynamo"
+  }
 }
 
-# Backend service (ALB+TG+Listener+TaskDef+Service)
-module "backend_service" {
+module "ecs-backend-service" {
   source = "../../../modules/ecs-backend-service"
 
   region = var.region
-  vpc_id = module.vpc.vpc_id
+  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
 
   alb_name    = "awsupskilling-alb"
   alb_sg      = data.terraform_remote_state.sg.outputs.alb_security_group_id
-  alb_subnets = module.vpc.public_subnets_id
+  alb_subnets = data.terraform_remote_state.vpc.outputs.public_subnets_id
 
-  cluster_id    = module.ecs_cluster.cluster_id
+  cluster_id    = data.terraform_remote_state.cluster.outputs.ecs_cluster_id
   service_name  = "moja-aplikacja-service"
   desired_count = 2
 
-  task_subnets     = module.vpc.public_subnets_id
+  task_subnets     = data.terraform_remote_state.vpc.outputs.public_subnets_id
   task_sg_ids      = [data.terraform_remote_state.sg.outputs.ecs_tasks_security_group_id]
   assign_public_ip = true
 
@@ -91,16 +99,16 @@ module "backend_service" {
   cpu                = "256"
   memory             = "512"
 
-  execution_role_arn = var.execution_role_arn
-  task_role_arn      = var.task_role_arn
+  execution_role_arn = data.terraform_remote_state.iam.outputs.execution_role_arn
+  task_role_arn      = data.terraform_remote_state.iam.outputs.task_role_arn
 
-  image_uri      = "${data.terraform_remote_state.ecr.outputs.repository_url}:latest"
+  image_uri = "${data.terraform_remote_state.ecr.outputs.ecr_repository_url}:latest"
   log_group_name = var.log_group_name
 
   environment = [
     {
       name  = "DYNAMODB_TABLE"
-      value = data.terraform_remote_state.dynamodb.outputs.table_name
+      value = data.terraform_remote_state.dynamodb.outputs.dynamodb_table_name
     }
   ]
 

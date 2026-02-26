@@ -22,17 +22,16 @@ data "terraform_remote_state" "vpc" {
 }
 
 resource "aws_security_group" "alb_sg" {
-  name = "awsupskilling-alb-sg"
-  description = "ALB Securitu group"
-  vpc_id = "vpc-09ff9a9f4fa826e31"
+  name        = "awsupskilling-alb-sg"
+  description = "ALB Security group"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 }
 
 resource "aws_security_group" "ecs_tasks_sg" {
-  name = "awsupskilling-ecs-tasks-sg"
+  name        = "awsupskilling-ecs-tasks-sg"
   description = "ECS Security group"
-  vpc_id = "vpc-09ff9a9f4fa826e31"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 }
-
 resource "aws_vpc_security_group_ingress_rule" "alb_http" {
     security_group_id = aws_security_group.alb_sg.id
     cidr_ipv4 = "0.0.0.0/0"

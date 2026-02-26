@@ -60,16 +60,7 @@ resource "aws_ecs_task_definition" "this" {
           protocol      = "tcp"
         }
       ]
-
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = var.log_group_name
-          awslogs-region        = var.region
-          awslogs-stream-prefix = var.service_name
-        }
-      }
-
+      
       environment = var.environment
     }
   ])
@@ -79,7 +70,7 @@ resource "aws_ecs_task_definition" "this" {
 
 resource "aws_ecs_service" "awsupskilling_service" {
   name            = var.service_name
-  cluster         = var.cluster_id
+  cluster         = cluster_id = data.terraform_remote_state.cluster.outputs.ecs_cluster_arn
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
   task_definition = aws_ecs_task_definition.this.arn
