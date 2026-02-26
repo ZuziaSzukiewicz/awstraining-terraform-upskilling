@@ -1,5 +1,5 @@
-output "ecs_cluster_id" {
-  value = module.ecs-backend-cluster.cluster_id
+output "ecs_cluster_name" {
+  value = module.ecs-backend-cluster.cluster_name
 }
 
 output "ecs_cluster_arn" {

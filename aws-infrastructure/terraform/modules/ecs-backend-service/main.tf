@@ -4,8 +4,6 @@ resource "aws_lb" "aws_upskilling_alb" {
   load_balancer_type = "application"
   security_groups    = [var.alb_sg]
   subnets            = var.alb_subnets
-
-  tags = var.common_tags
 }
 
 resource "aws_lb_target_group" "awsupskilling_target_group" {
@@ -23,8 +21,6 @@ resource "aws_lb_target_group" "awsupskilling_target_group" {
     interval            = 30
     matcher             = "200-399"
   }
-
-  tags = var.common_tags
 }
 
 resource "aws_lb_listener" "http" {
@@ -36,11 +32,9 @@ resource "aws_lb_listener" "http" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.awsupskilling_target_group.arn
   }
-
-  tags = var.common_tags
 }
 
-resource "aws_ecs_task_definition" "this" {
+resource "aws_ecs_task_definition" "awsupskilling_taskdef" {
   family                   = var.task_family
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -53,6 +47,7 @@ resource "aws_ecs_task_definition" "this" {
     {
       name  = var.container_name
       image = var.image_uri
+      secrets = var.secrets
 
       portMappings = [
         {
@@ -65,15 +60,14 @@ resource "aws_ecs_task_definition" "this" {
     }
   ])
 
-  tags = var.common_tags
 }
 
 resource "aws_ecs_service" "awsupskilling_service" {
   name            = var.service_name
-  cluster         = cluster_id = data.terraform_remote_state.cluster.outputs.ecs_cluster_arn
+  cluster = var.cluster_id
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
-  task_definition = aws_ecs_task_definition.this.arn
+  task_definition = aws_ecs_task_definition.awsupskilling_taskdef.arn
 
   depends_on = [aws_lb_listener.http]
 
@@ -89,5 +83,4 @@ resource "aws_ecs_service" "awsupskilling_service" {
     container_port   = var.container_port
   }
 
-  tags = var.common_tags
 }

@@ -6,7 +6,6 @@ variable "vpc_id" {
   type = string
 }
 
-# ALB
 variable "alb_name" {
   type = string
 }
@@ -19,7 +18,6 @@ variable "alb_subnets" {
   type = list(string)
 }
 
-# ECS Service
 variable "cluster_id" {
   type = string
 }
@@ -46,7 +44,6 @@ variable "assign_public_ip" {
   default = true
 }
 
-# Container
 variable "container_name" {
   type = string
 }
@@ -60,12 +57,10 @@ variable "health_check_path" {
   default = "/actuator/health"
 }
 
-# Task Definition
 variable "task_family" {
   type = string
 }
 
-# Fargate expects cpu/memory as strings (e.g. "256", "512", "1024")
 variable "cpu" {
   type = string
 }
@@ -80,6 +75,7 @@ variable "execution_role_arn" {
 
 variable "task_role_arn" {
   type = string
+  default = null
 }
 
 variable "image_uri" {
@@ -88,12 +84,24 @@ variable "image_uri" {
 
 variable "log_group_name" {
   type = string
+  default = null
+
 }
 
 variable "environment" {
   type = list(object({
     name  = string
     value = string
+
+  }))
+  default = []
+}
+
+variable "secrets" {
+  type = list(object({
+    name  = string
+    valueForm = string
+    
   }))
   default = []
 }
