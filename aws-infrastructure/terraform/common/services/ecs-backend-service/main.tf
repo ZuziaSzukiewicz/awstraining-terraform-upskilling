@@ -38,6 +38,16 @@ data "terraform_remote_state" "securitygroups" {
   }
 }
 
+data "terraform_remote_state" "cluster" {
+  backend = "s3"
+  config = {
+    bucket         = var.remote_state_bucket
+    key            = "ecs-backend-cluster.tfstate"
+    region         = var.region
+    dynamodb_table = "backend_tf_lock_remote_dynamo"
+  }
+}
+
 data "terraform_remote_state" "globals" {
   backend = "s3"
   config = {
@@ -48,7 +58,7 @@ data "terraform_remote_state" "globals" {
   }
 }
 
-module "ecs-backend-service" {
+module "ecs_backend_service" {
   source = "../../../modules/ecs-backend-service"
 
   region = var.region
@@ -58,7 +68,7 @@ module "ecs-backend-service" {
   alb_sg      = data.terraform_remote_state.securitygroups.outputs.alb_security_group_id
   alb_subnets = data.terraform_remote_state.vpc.outputs.public_subnets_id
 
-  cluster_id    = data.terraform_remote_state.globals.outputs.ecs_cluster_name
+  cluster_id    = data.terraform_remote_state.cluster.outputs.ecs_cluster_name
   service_name  = "awsupskilling_service"
   desired_count = 2
 
@@ -77,12 +87,12 @@ module "ecs-backend-service" {
   execution_role_arn = data.aws_iam_role.exec.arn
   task_role_arn      = data.aws_iam_role.task.arn
 
-  image_uri = "${data.terraform_remote_state.globals.outputs.ecr_repository_url}:latest"
+  image_uri = "497196579670.dkr.ecr.eu-central-1.amazonaws.com/awsupskilling_ecr_repo:latest"
 
   environment = [
     {
       name  = "DYNAMODB_TABLE"
-      value = data.terraform_remote_state.globals.outputs.dynamodb_table_name
+      value = "arn:aws:dynamodb:eu-central-1:497196579670:table/Measurements"
     },
     {
       name  = "HUB"
@@ -97,7 +107,7 @@ module "ecs-backend-service" {
   secrets = [
     {
       name = "SPRING_APPLICATION_JSON"
-      valueForm = "arn:aws:secretsmanager:eu-central-1:497196579670:secret:awsupskilling-secret-authorization-Daln1m"
+      valueFrom = "arn:aws:secretsmanager:eu-central-1:497196579670:secret:awsupskilling-secret-authorization-Daln1m"
     }
       
   ]

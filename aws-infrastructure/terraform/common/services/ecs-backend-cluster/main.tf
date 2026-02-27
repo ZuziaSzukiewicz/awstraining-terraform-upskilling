@@ -10,7 +10,7 @@ terraform {
   }
 }
 
-module "ecs-backend-cluster" {
+module "ecs_backend_cluster" {
   source       = "../../../modules/ecs-backend-cluster"
   name = "awsupskilling_ecs_cluster"
 }

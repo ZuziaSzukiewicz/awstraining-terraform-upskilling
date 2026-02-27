@@ -100,7 +100,7 @@ variable "environment" {
 variable "secrets" {
   type = list(object({
     name  = string
-    valueForm = string
+    valueFrom = string
     
   }))
   default = []

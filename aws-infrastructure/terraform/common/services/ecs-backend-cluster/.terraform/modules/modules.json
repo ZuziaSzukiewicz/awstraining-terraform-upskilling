@@ -1,1 +1,1 @@
-{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"ecs-backend-cluster","Source":"../../../modules/ecs-backend-cluster","Dir":"../../../modules/ecs-backend-cluster"}]}
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"ecs-backend-cluster","Source":"../../../modules/ecs-backend-cluster","Dir":"../../../modules/ecs-backend-cluster"},{"Key":"ecs_backend_cluster","Source":"../../../modules/ecs-backend-cluster","Dir":"../../../modules/ecs-backend-cluster"}]}

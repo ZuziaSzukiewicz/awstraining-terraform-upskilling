@@ -47,7 +47,7 @@
       "cpu": 1024,
       "memory": 2048,
       "memoryReservation": 1024,
-      "image": "<<TODO: set ECR image address>>",
+      "image": "497196579670.dkr.ecr.eu-central-1.amazonaws.com/awsupskilling_ecr_repo:latest",
       "dockerLabels": {
         "PROMETHEUS_EXPORTER_PORT": "8081",
         "PROMETHEUS_EXPORTER_PATH": "/backend/status/v1/prometheus",
@@ -57,7 +57,7 @@
       "name": "backend"
     }
   ],
-  "taskRoleArn": "<<TODO: set task role ARN>>",
+  "taskRoleArn": "arn:aws:iam::497196579670:role/ecs-taskdef",
   "requiresCompatibilities": ["FARGATE"],
   "networkMode": "awsvpc",
   "memory": "2048",
